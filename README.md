@@ -1,4 +1,4 @@
-# yacc from scratch
+# yacc from scratch?
 
 Goal: Write a crappy yacc-like tool for creating parsers
 
