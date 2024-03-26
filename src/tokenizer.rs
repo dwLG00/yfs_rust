@@ -42,7 +42,9 @@ fn handle_constants(c: char, tokens: &mut Vec<Token>, stack: &mut String) {
     }
 }
 
-fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<String, usize>, term_table_reverse: &mut HashMap<usize, String>, current_term_id: usize) -> usize {
+fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<String, usize>,
+    term_table_reverse: &mut HashMap<usize, String>, current_term_id: usize
+) -> usize {
     match term_table.get(&term) {
         Some(term_id) => {
             tokens.push(Token::Term(*term_id));
@@ -58,10 +60,10 @@ fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<S
 }
 
 pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<usize, String>)>{
-    let mut tokens: Vec<Token> = Vec::new();
+    let mut tokens = Vec::new();
     let mut stack = String::new();
-    let mut term_table = HashMap::<String, usize>::new();
-    let mut term_table_reverse = HashMap::<usize, String>::new();
+    let mut term_table = HashMap::new();
+    let mut term_table_reverse = HashMap::new();
     let mut current_term_id: usize = 0;
     let mut backslash_flag: bool = false;
 
@@ -69,7 +71,7 @@ pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<usize, String>)>{
         if stack.len() == 0 {
             handle_constants(c, &mut tokens, &mut stack);
         } else {
-            match stack.chars().nth(0)? {
+            match stack.chars().next()? {
                 SQUOTE | DQUOTE => {
                     if quote_disallowed(c) {
                         println!("Tokenizer: Character {} not allowed in quotes", c);
@@ -88,7 +90,7 @@ pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<usize, String>)>{
                         backslash_flag = false;
                         continue;
                     }
-                    if c == stack.chars().nth(0)? {
+                    if c == stack.chars().next()? {
                         let literal = (stack[1..]).to_string();
                         tokens.push(Token::Literal(literal));
                         stack.clear();
@@ -118,7 +120,7 @@ pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<usize, String>)>{
     }
 
     if stack.len() > 0 {
-        match stack.chars().nth(0) {
+        match stack.chars().next() {
             Some(c) => if c == SQUOTE || c == DQUOTE {
                 println!("Tokenizer: Unclosed quote at end");
                 return None;
