@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use std::collections::HashSet;
 use crate::tokenizer;
 
 #[derive(Debug)]
@@ -89,7 +87,7 @@ impl Node {
             },
             SemType::Statement => match token {
                 Some(tokenizer::Token::Term(id)) => {
-                    let mut left = Node {
+                    let left = Node {
                         semtype: SemType::Term(id),
                         left: None,
                         right: None
@@ -125,7 +123,7 @@ impl Node {
                         self.right = Some(Box::new(right));
                         new_new_idx
                     },
-                    _ => panic!()
+                    x => panic!("Can't seek token {:?}", x)
                 },
                 None => panic!()
             },
@@ -205,7 +203,7 @@ impl Node {
             SemType::LitTerm => match token {
                 Some(t) => match t {
                     tokenizer::Token::Term(id) => {
-                        let mut left = Node {
+                        let left = Node {
                             semtype: SemType::Term(id),
                             left: None,
                             right: None
@@ -214,7 +212,7 @@ impl Node {
                         idx + 1
                     },
                     tokenizer::Token::Literal(s) => {
-                        let mut left = Node {
+                        let left = Node {
                             semtype: SemType::Literal(s.clone()),
                             left: None,
                             right: None
