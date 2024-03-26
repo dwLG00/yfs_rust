@@ -36,6 +36,9 @@ pub struct Node {
 
 impl Node {
     fn fulfill_production(&mut self, tokens: &Vec<tokenizer::Token>, idx: usize) -> usize {
+        // Recursively applies the correct production to subnodes
+
+        // Get current head token, or None if index out of range
         let token = if idx < tokens.len() {
             Some(tokens[idx].clone())
         } else {
@@ -43,7 +46,7 @@ impl Node {
         };
 
         match self.semtype {
-            SemType::Root => match token {
+            SemType::Root => match token { // Match only terms
                 Some(tokenizer::Token::Term(_)) => {
                     let mut left = Node {
                         semtype: SemType::Statement,
@@ -58,13 +61,16 @@ impl Node {
                     let new_idx = left.fulfill_production(&tokens, idx);
                     let new_new_idx = right.fulfill_production(&tokens, new_idx);
                     self.left = Some(Box::new(left));
-                    self.right = Some(Box::new(right));
+                    self.right = match right.left { // Check if right node is empty AuxRoot
+                        Some(_) => Some(Box::new(right)),
+                        None => None
+                    };
                     new_new_idx
                 },
-                None => {idx},
+                None => {idx}, // Exit if idx out of range
                 _ => panic!(),
             },
-            SemType::AuxRoot => match token {
+            SemType::AuxRoot => match token { // Match terms only
                 Some(tokenizer::Token::Term(_)) => {
                     let mut left = Node {
                         semtype: SemType::Statement,
@@ -79,7 +85,10 @@ impl Node {
                     let new_idx = left.fulfill_production(&tokens, idx);
                     let new_new_idx = right.fulfill_production(&tokens, new_idx);
                     self.left = Some(Box::new(left));
-                    self.right = Some(Box::new(right));
+                    self.right = match right.left { // Check if the right node is an empty AuxRoot
+                        Some(_) => Some(Box::new(right)),
+                        None => None
+                    };
                     new_new_idx
                 },
                 None => {idx},
@@ -120,7 +129,10 @@ impl Node {
                         let new_idx = left.fulfill_production(&tokens, idx);
                         let new_new_idx = right.fulfill_production(&tokens, new_idx);
                         self.left = Some(Box::new(left));
-                        self.right = Some(Box::new(right));
+                        self.right = match right.left {
+                            Some(_) => Some(Box::new(right)),
+                            None => None
+                        };
                         new_new_idx
                     },
                     x => panic!("Can't seek token {:?}", x)
@@ -146,7 +158,10 @@ impl Node {
                         let new_idx = left.fulfill_production(&tokens, idx + 1);
                         let new_new_idx = right.fulfill_production(&tokens, new_idx);
                         self.left = Some(Box::new(left));
-                        self.right = Some(Box::new(right));
+                        self.right = match right.left {
+                            Some(_) => Some(Box::new(right)),
+                            None => None
+                        };
                         new_new_idx
                     },
                     _ => panic!()
@@ -168,8 +183,11 @@ impl Node {
                         };
                         let new_idx = left.fulfill_production(&tokens, idx);
                         let new_new_idx = right.fulfill_production(&tokens, new_idx);
-                        self.left = Some(Box::new(left));
-                        self.right = Some(Box::new(right));
+                        self.left = left.left;
+                        self.right = match right.left {
+                            Some(_) => Some(Box::new(right)),
+                            None => None
+                        };
                         new_new_idx
                     },
                     _ => panic!()
@@ -192,8 +210,11 @@ impl Node {
                         };
                         let new_idx = left.fulfill_production(&tokens, idx + 1);
                         let new_new_idx = right.fulfill_production(&tokens, new_idx);
-                        self.left = Some(Box::new(left));
-                        self.right = Some(Box::new(right));
+                        self.left = left.left;
+                        self.right = match right.left {
+                            Some(_) => Some(Box::new(right)),
+                            None => None
+                        };
                         new_new_idx
                     },
                     _ => panic!()
