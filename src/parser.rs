@@ -12,7 +12,7 @@ pub enum SemType {
     Subexpression,
     LitTerm,
     Literal(String),
-    Term(u32)
+    Term(usize)
 }
 
 /*

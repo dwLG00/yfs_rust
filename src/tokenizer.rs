@@ -19,14 +19,13 @@ fn quote_disallowed(c: char) -> bool {
     }
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Token {
     Defn,
     And,
     Or,
     Terminal,
-    Term(u32),
+    Term(usize),
     Literal(String)
 }
 
@@ -43,7 +42,7 @@ fn handle_constants(c: char, tokens: &mut Vec<Token>, stack: &mut String) {
     }
 }
 
-fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<String, u32>, term_table_reverse: &mut HashMap<u32, String>, current_term_id: u32) -> u32 {
+fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<String, usize>, term_table_reverse: &mut HashMap<usize, String>, current_term_id: usize) -> usize {
     match term_table.get(&term) {
         Some(term_id) => {
             tokens.push(Token::Term(*term_id));
@@ -58,12 +57,12 @@ fn handle_term(term: String, tokens: &mut Vec<Token>, term_table: &mut HashMap<S
     }
 }
 
-pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<u32, String>)>{
+pub fn tokenize(string: String) -> Option<(Vec<Token>, HashMap<usize, String>)>{
     let mut tokens: Vec<Token> = Vec::new();
     let mut stack = String::new();
-    let mut term_table = HashMap::<String, u32>::new();
-    let mut term_table_reverse = HashMap::<u32, String>::new();
-    let mut current_term_id: u32 = 0;
+    let mut term_table = HashMap::<String, usize>::new();
+    let mut term_table_reverse = HashMap::<usize, String>::new();
+    let mut current_term_id: usize = 0;
     let mut backslash_flag: bool = false;
 
     for c in string.chars() {
